@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def substitute(s, sbox):
     substi = []
     i = 0
@@ -21,6 +24,42 @@ def shiftrows(s):
         shifted_s.append(s[i][i:] + s[i][:i])
 
     return shifted_s
+
+
+def multiply(x, y):
+
+    initial_y = y
+
+    if x == 1:
+        return y
+    else:
+        y = y << 1
+        if y > 255:
+            y ^= int('11B', 16)
+        if x == 3:
+            y ^= initial_y
+    return y
+
+
+def mixcolumns(s):
+
+    fixed_matrix = [[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]]
+
+    for k in range(len(s)):
+        for j in range(len(s[k])):
+            s[k][j] = int(s[k][j], 16)
+
+    c = [[0 for row in range(len(s))] for col in range(len(fixed_matrix))]
+
+    for i in range(len(s)):
+        for j in range(len(fixed_matrix)):
+            for k in range(len(s)):
+                c[i][j] ^= multiply(fixed_matrix[i][k], s[k][j])
+
+    for k in range(len(c)):
+        for j in range(len(c[k])):
+            c[k][j] = hex(c[k][j])[2:]
+    return c
 
 s = ['EA', '04', '65', '85', '83', '45', '5D', '96',
      '5C', '33', '98', 'B0', 'F0', '2D', 'AD', 'C5']
@@ -60,8 +99,12 @@ sbox = [['63', '7c', '77', '7b', 'f2', '6b', '6f', 'c5',
 
 # print(s, "\n", sbox)
 
-print(substitute(s, sbox))
+# print(substitute(s, sbox))
 
 new_s = substitute(s, sbox)
 
 print(shiftrows(new_s))
+
+shift_rows = shiftrows(new_s)
+
+print(mixcolumns(shift_rows))
