@@ -1,5 +1,3 @@
-import numpy as np
-
 
 def substitute(s, sbox):
     substi = []
@@ -61,8 +59,51 @@ def mixcolumns(s):
             c[k][j] = hex(c[k][j])[2:]
     return c
 
+
+def rcon(i):
+    rcon_i = [0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36]
+    return rcon_i[i]
+
+
+def schedule(key, iteration, atable, ltable):
+    new_key = key
+    new_key = new_key[1:] + new_key[:1]
+    for k in range(0, len(new_key)):
+        i = int(new_key[k], 16)
+        #sbox value
+        #new_key[k] = sbox1(i)
+    new_key[0] ^= rcon(iteration)
+    return new_key
+
+
+def Rijndael_key_schedule(key):
+    # temporaray 4-byte
+    c = 16
+    iteration = 1
+    # for i in range(len(key)):
+        # key[i] = int(key[i], 16)
+    # we need 11 sets of 16 bytes each
+    key_i = []
+    for k in range(0, len(key)):
+        key_i.append(int(key[k], 16))
+    while c < 176:
+        t = []
+        for i in range(4):
+            t.append(key[i + c - 4])
+        if c % 16 == 0:
+            t = schedule(t,iteration)
+            iteration += 1
+        for i in range(4):
+            print(t[i])
+            # key_i[c] = key_i[c - 16] ^ t[i]
+            c += 1
+    return key_i
+
 s = ['EA', '04', '65', '85', '83', '45', '5D', '96',
      '5C', '33', '98', 'B0', 'F0', '2D', 'AD', 'C5']
+
+key = 'ffffffffffffffffffffffffffffffff'
+# key = ['f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f']
 
 sbox = [['63', '7c', '77', '7b', 'f2', '6b', '6f', 'c5',
          '30', '01', '67', '2b', 'fe', 'd7', 'ab', '76'],
@@ -97,6 +138,7 @@ sbox = [['63', '7c', '77', '7b', 'f2', '6b', '6f', 'c5',
         ['8c', 'a1', '89', '0d', 'bf', 'e6', '42', '68',
          '41', '99', '2d', '0f', 'b0', '54', 'bb', '16']]
 
+
 # print(s, "\n", sbox)
 
 # print(substitute(s, sbox))
@@ -108,3 +150,7 @@ print(shiftrows(new_s))
 shift_rows = shiftrows(new_s)
 
 print(mixcolumns(shift_rows))
+
+print(rcon(1), rcon(2), rcon(10))
+
+print(Rijndael_key_schedule(key))
