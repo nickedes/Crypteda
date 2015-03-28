@@ -104,3 +104,14 @@ t = ['f', 'f', 'f', 'f']
 t = schedule(t, 1, atable,ltable)
 for x in t:
     print(hex(x))
+
+
+def rotword(word):
+    # ['fa','bb','13','cd'] -> ['df','ab','b1','3c']
+    word = ''.join(word)
+    word = word[len(word)-1:]+word[:len(word)-1]
+    join_by_2 = []        
+    for i in range(0,len(word),2):
+        join_by_2.append(word[i:i+2])
+    word = join_by_2    
+    return word

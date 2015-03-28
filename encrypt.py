@@ -11,6 +11,53 @@ def substitute(s, sbox):
             i = i + 1
     return substi
 
+def gen(key):
+    keys = {}
+    first_key = []
+    for k in range(0, int(len(key) / 8)):
+        first_key.append([])
+    for i in range(len(key)):
+        first_key[int(i/8)].append(key[i])
+    
+    # ['f','a','b','b','1','3','c','d'] -> ['fa','bb','13','cd']
+    for i in range(len(first_key)):
+        join_by_2 = []
+        for j in range(0,len(first_key[i]),2):
+            join_by_2.append(''.join(first_key[i][j:j+2]))
+        first_key[i]=join_by_2
+    w = []
+    for i in range(44):
+        w.append([])
+    # 4 words
+    for i in range(len(first_key)):
+        w[i]=first_key[i]
+    # no. of words
+    i = 4
+    # until no. of words = 44
+    while i<44:
+        temp = w[i-1]
+        if i%4 == 0:
+            temp = sub(rotword(temp))
+            #^ rcon(i/4)
+            temp[3] = hex(int(temp[3],16) ^ rcon(int(i/4)))[2:]
+        for j in range(len(temp)):
+            temp[j] = hex(int(temp[j],16) ^ int(w[i-4][j],16))[2:]
+        print(temp)
+        w[i]=temp
+        i+=1
+    return w    
+
+def rotword(word):
+    # ['fa','bb','13','cd'] -> ['bb','13','cd','fa']  
+    return word[1:]+word[:1]
+
+def sub(word):
+    # ['fa','bb','13','cd'] -> sbox values
+    for i in range(len(word)):
+        if len(word[i]) == 1:
+            word[i] ='0'+word[i]
+        word[i] = sbox[int(word[i][0], 16)][int(word[i][1], 16)]
+    return word
 
 def shiftrows(s):
     shifted_s = []
@@ -65,46 +112,14 @@ def rcon(i):
     return rcon_i[i]
 
 
-def schedule(key, iteration, atable, ltable):
-    new_key = key
-    new_key = new_key[1:] + new_key[:1]
-    for k in range(0, len(new_key)):
-        i = int(new_key[k], 16)
-        #sbox value
-        #new_key[k] = sbox1(i)
-    new_key[0] ^= rcon(iteration)
-    return new_key
-
-
-def Rijndael_key_schedule(key):
-    # temporaray 4-byte
-    c = 16
-    iteration = 1
-    # for i in range(len(key)):
-        # key[i] = int(key[i], 16)
-    # we need 11 sets of 16 bytes each
-    key_i = []
-    for k in range(0, len(key)):
-        key_i.append(int(key[k], 16))
-    while c < 176:
-        t = []
-        for i in range(4):
-            t.append(key[i + c - 4])
-        if c % 16 == 0:
-            t = schedule(t,iteration)
-            iteration += 1
-        for i in range(4):
-            print(t[i])
-            # key_i[c] = key_i[c - 16] ^ t[i]
-            c += 1
-    return key_i
-
 s = ['EA', '04', '65', '85', '83', '45', '5D', '96',
      '5C', '33', '98', 'B0', 'F0', '2D', 'AD', 'C5']
 
-key = 'ffffffffffffffffffffffffffffffff'
-# key = ['f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f']
-
+# key = 'ffffffffffffffffffffffffffffffff'
+key = ['f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f']
+# key = ['ff', 'ff', 'ff', 'ff', 'ff', 'ff', 'ff', 'ff',
+       # 'ff', 'ff', 'ff', 'ff', 'ff', 'ff', 'ff', 'ff']
+key1 = ['d','6','d','3','a','3','9','7','6','4','e','8','9','2','0','4','0','8','2','e','b','5','d','d','2','b','8','e','d','5','7','6']
 sbox = [['63', '7c', '77', '7b', 'f2', '6b', '6f', 'c5',
          '30', '01', '67', '2b', 'fe', 'd7', 'ab', '76'],
         ['ca', '82', 'c9', '7d', 'fa', '59', '47', 'f0',
@@ -153,4 +168,9 @@ print(mixcolumns(shift_rows))
 
 print(rcon(1), rcon(2), rcon(10))
 
-print(Rijndael_key_schedule(key))
+# print(Rijndael_key_schedule(key))
+# print(gen(key))
+
+# print(rotword(['fa','bb','13','cd
+
+print(gen(key1))
