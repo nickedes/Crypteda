@@ -30,22 +30,27 @@ def gen(key):
         w.append([])
     # 4 words
     for i in range(len(first_key)):
-        w[i]=first_key[i]
+        for j in range(len(first_key[i])):
+            w[j].append(first_key[i][j])
     # no. of words
     i = 4
     # until no. of words = 44
     while i<44:
-        temp = w[i-1]
+        temp = []
+        for x in w[i-1]:
+            temp.append(x)
         if i%4 == 0:
             temp = sub(rotword(temp))
             #^ rcon(i/4)
-            temp[3] = hex(int(temp[3],16) ^ rcon(int(i/4)))[2:]
+            temp[0] = hex(int(temp[0],16) ^ rcon(int(i/4)))[2:]
         for j in range(len(temp)):
             temp[j] = hex(int(temp[j],16) ^ int(w[i-4][j],16))[2:]
-        print(temp)
+        # print(temp)
         w[i]=temp
+        keys[i]=w[i]
+        print(w[i])
         i+=1
-    return w    
+    return keys
 
 def rotword(word):
     # ['fa','bb','13','cd'] -> ['bb','13','cd','fa']  
