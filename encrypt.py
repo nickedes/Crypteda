@@ -145,8 +145,8 @@ s = [['f3', 'cf', '4d', '15'], ['bf', '4b', 'fb', 'a6'],
 
 # key = 'ffffffffffffffffffffffffffffffff'
 key = ['d', '6', 'd', '3', 'a', '3', '9', '7', '6', '4', 'e', '8', '9', '2',
-        '0', '4', '0', '8', '2', 'e', 'b', '5', 'd', 'd', '2', 'b', '8', 'e',
-        'd', '5', '7', '6']
+       '0', '4', '0', '8', '2', 'e', 'b', '5', 'd', 'd', '2', 'b', '8', 'e',
+       'd', '5', '7', '6']
 
 sbox = [['63', '7c', '77', '7b', 'f2', '6b', '6f', 'c5',
          '30', '01', '67', '2b', 'fe', 'd7', 'ab', '76'],
@@ -181,21 +181,24 @@ sbox = [['63', '7c', '77', '7b', 'f2', '6b', '6f', 'c5',
         ['8c', 'a1', '89', '0d', 'bf', 'e6', '42', '68',
          '41', '99', '2d', '0f', 'b0', '54', 'bb', '16']]
 
-print("Plain text:",s)
+print("Plain text:", s)
 all_key = gen(key)
 key = word_to_key([all_key[0], all_key[1], all_key[2], all_key[3]])
 key_no = 4
+s = add_round_key(s, key)
+print(s)
 #   Round 1
-round = 1
-while round < 10:
-    round_text = mixcolumns(shiftrows(substitute(add_round_key(s, key), sbox)))
+round = 2
+while round < 11:
+    round_text = mixcolumns(shiftrows(substitute(s, sbox)))
     key = (word_to_key(
         [all_key[key_no], all_key[key_no + 1], all_key[key_no + 2], all_key[key_no + 3]]))
-    s = round_text
+    s = add_round_key(round_text, key)
+    print(s)
     key_no += 4
     round += 1
-last_round = shiftrows(substitute(add_round_key(s, key), sbox))
+last_round = shiftrows(substitute(s, sbox))
 last_key = (word_to_key(
     [all_key[key_no], all_key[key_no + 1], all_key[key_no + 2], all_key[key_no + 3]]))
 encrypted_text = add_round_key(last_round, last_key)
-print("encrypted text: ",encrypted_text)
+print("encrypted text: ", encrypted_text)
