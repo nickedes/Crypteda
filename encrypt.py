@@ -2,14 +2,16 @@
 def substitute(s, sbox):
     substi = []
     i = 0
-    for k in range(0, int(len(s) / 4)):
+    for k in range(len(s)):
         substi.append([])
 
     for k in range(len(s)):
-        substi[i].append(sbox[int(s[k][0], 16)][int(s[k][1], 16)])
-        if (k + 1) % 4 == 0:
-            i = i + 1
+        for i in range(len(s[k])):
+            if len(s[k][i]) == 1:
+                s[k][i] = '0' + s[k][i]
+            substi[k].append(sbox[int(s[k][i][0], 16)][int(s[k][i][1], 16)])
     return substi
+
 
 def gen(key):
     keys = {}
@@ -17,14 +19,14 @@ def gen(key):
     for k in range(0, int(len(key) / 8)):
         first_key.append([])
     for i in range(len(key)):
-        first_key[int(i/8)].append(key[i])
-    
+        first_key[int(i / 8)].append(key[i])
+
     # ['f','a','b','b','1','3','c','d'] -> ['fa','bb','13','cd']
     for i in range(len(first_key)):
         join_by_2 = []
-        for j in range(0,len(first_key[i]),2):
-            join_by_2.append(''.join(first_key[i][j:j+2]))
-        first_key[i]=join_by_2
+        for j in range(0, len(first_key[i]), 2):
+            join_by_2.append(''.join(first_key[i][j:j + 2]))
+        first_key[i] = join_by_2
     w = []
     for i in range(44):
         w.append([])
@@ -32,37 +34,39 @@ def gen(key):
     for i in range(len(first_key)):
         for j in range(len(first_key[i])):
             w[j].append(first_key[i][j])
+        keys[i] = w[i]
     # no. of words
     i = 4
     # until no. of words = 44
-    while i<44:
+    while i < 44:
         temp = []
-        for x in w[i-1]:
+        for x in w[i - 1]:
             temp.append(x)
-        if i%4 == 0:
+        if i % 4 == 0:
             temp = sub(rotword(temp))
             #^ rcon(i/4)
-            temp[0] = hex(int(temp[0],16) ^ rcon(int(i/4)))[2:]
+            temp[0] = hex(int(temp[0], 16) ^ rcon(int(i / 4)))[2:]
         for j in range(len(temp)):
-            temp[j] = hex(int(temp[j],16) ^ int(w[i-4][j],16))[2:]
-        # print(temp)
-        w[i]=temp
-        keys[i]=w[i]
-        print(w[i])
-        i+=1
+            temp[j] = hex(int(temp[j], 16) ^ int(w[i - 4][j], 16))[2:]
+        w[i] = temp
+        keys[i] = w[i]
+        i += 1
     return keys
 
+
 def rotword(word):
-    # ['fa','bb','13','cd'] -> ['bb','13','cd','fa']  
-    return word[1:]+word[:1]
+    # ['fa','bb','13','cd'] -> ['bb','13','cd','fa']
+    return word[1:] + word[:1]
+
 
 def sub(word):
     # ['fa','bb','13','cd'] -> sbox values
     for i in range(len(word)):
         if len(word[i]) == 1:
-            word[i] ='0'+word[i]
+            word[i] = '0' + word[i]
         word[i] = sbox[int(word[i][0], 16)][int(word[i][1], 16)]
     return word
+
 
 def shiftrows(s):
     shifted_s = []
@@ -117,14 +121,33 @@ def rcon(i):
     return rcon_i[i]
 
 
-s = ['EA', '04', '65', '85', '83', '45', '5D', '96',
-     '5C', '33', '98', 'B0', 'F0', '2D', 'AD', 'C5']
+def word_to_key(words):
+    key = []
+    for i in range(len(words)):
+        key.append([])
+    for i in range(len(words)):
+        for j in range(len(words[i])):
+            key[i].append(words[j][i])
+    return key
+
+
+def add_round_key(state, key):
+
+    for i in range(len(key)):
+        for j in range(len(key[i])):
+
+            key[i][j] = hex(
+                int(key[i][j], 16) ^ int(state[i][j], 16))[2:]
+    return key
+
+s = [['f3', 'cf', '4d', '15'], ['bf', '4b', 'fb', 'a6'],
+     ['8b', 'e2', '52', '58'], ['12', 'ab', '4b', 'b8']]
 
 # key = 'ffffffffffffffffffffffffffffffff'
-key = ['f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f']
-# key = ['ff', 'ff', 'ff', 'ff', 'ff', 'ff', 'ff', 'ff',
-       # 'ff', 'ff', 'ff', 'ff', 'ff', 'ff', 'ff', 'ff']
-key1 = ['d','6','d','3','a','3','9','7','6','4','e','8','9','2','0','4','0','8','2','e','b','5','d','d','2','b','8','e','d','5','7','6']
+key = ['d', '6', 'd', '3', 'a', '3', '9', '7', '6', '4', 'e', '8', '9', '2',
+        '0', '4', '0', '8', '2', 'e', 'b', '5', 'd', 'd', '2', 'b', '8', 'e',
+        'd', '5', '7', '6']
+
 sbox = [['63', '7c', '77', '7b', 'f2', '6b', '6f', 'c5',
          '30', '01', '67', '2b', 'fe', 'd7', 'ab', '76'],
         ['ca', '82', 'c9', '7d', 'fa', '59', '47', 'f0',
@@ -158,24 +181,21 @@ sbox = [['63', '7c', '77', '7b', 'f2', '6b', '6f', 'c5',
         ['8c', 'a1', '89', '0d', 'bf', 'e6', '42', '68',
          '41', '99', '2d', '0f', 'b0', '54', 'bb', '16']]
 
-
-# print(s, "\n", sbox)
-
-# print(substitute(s, sbox))
-
-new_s = substitute(s, sbox)
-
-print(shiftrows(new_s))
-
-shift_rows = shiftrows(new_s)
-
-print(mixcolumns(shift_rows))
-
-print(rcon(1), rcon(2), rcon(10))
-
-# print(Rijndael_key_schedule(key))
-# print(gen(key))
-
-# print(rotword(['fa','bb','13','cd
-
-print(gen(key1))
+print("Plain text:",s)
+all_key = gen(key)
+key = word_to_key([all_key[0], all_key[1], all_key[2], all_key[3]])
+key_no = 4
+#   Round 1
+round = 1
+while round < 10:
+    round_text = mixcolumns(shiftrows(substitute(add_round_key(s, key), sbox)))
+    key = (word_to_key(
+        [all_key[key_no], all_key[key_no + 1], all_key[key_no + 2], all_key[key_no + 3]]))
+    s = round_text
+    key_no += 4
+    round += 1
+last_round = shiftrows(substitute(add_round_key(s, key), sbox))
+last_key = (word_to_key(
+    [all_key[key_no], all_key[key_no + 1], all_key[key_no + 2], all_key[key_no + 3]]))
+encrypted_text = add_round_key(last_round, last_key)
+print("encrypted text: ",encrypted_text)
