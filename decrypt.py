@@ -1,4 +1,5 @@
 from tables import *
+from encrypt import gen
 
 def inv_substi(s, inv_sbox):
     substi = []
@@ -60,47 +61,6 @@ def inv_shiftrows(s):
         shifted_s.append(s[i][len(s) - i:] + s[i][:len(s) - i])
 
     return shifted_s
-
-
-def gen(key):
-    keys = {}
-    first_key = []
-    for k in range(0, int(len(key) / 8)):
-        first_key.append([])
-    for i in range(len(key)):
-        first_key[int(i / 8)].append(key[i])
-
-    # ['f','a','b','b','1','3','c','d'] -> ['fa','bb','13','cd']
-    for i in range(len(first_key)):
-        join_by_2 = []
-        for j in range(0, len(first_key[i]), 2):
-            join_by_2.append(''.join(first_key[i][j:j + 2]))
-        first_key[i] = join_by_2
-    w = []
-    for i in range(44):
-        w.append([])
-    # 4 words
-    for i in range(len(first_key)):
-        for j in range(len(first_key[i])):
-            w[j].append(first_key[i][j])
-        keys[i] = w[i]
-    # no. of words
-    i = 4
-    # until no. of words = 44
-    while i < 44:
-        temp = []
-        for x in w[i - 1]:
-            temp.append(x)
-        if i % 4 == 0:
-            temp = sub(rotword(temp))
-            #^ rcon(i/4)
-            temp[0] = hex(int(temp[0], 16) ^ rcon(int(i / 4)))[2:]
-        for j in range(len(temp)):
-            temp[j] = hex(int(temp[j], 16) ^ int(w[i - 4][j], 16))[2:]
-        w[i] = temp
-        keys[i] = w[i]
-        i += 1
-    return keys
 
 
 def rotword(word):

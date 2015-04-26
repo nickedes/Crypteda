@@ -1,5 +1,6 @@
 from tables import *
 
+
 def substitute(s, sbox):
     substi = []
     i = 0
@@ -16,18 +17,7 @@ def substitute(s, sbox):
 
 def gen(key):
     keys = {}
-    first_key = []
-    for k in range(0, int(len(key) / 8)):
-        first_key.append([])
-    for i in range(len(key)):
-        first_key[int(i / 8)].append(key[i])
-
-    # ['f','a','b','b','1','3','c','d'] -> ['fa','bb','13','cd']
-    for i in range(len(first_key)):
-        join_by_2 = []
-        for j in range(0, len(first_key[i]), 2):
-            join_by_2.append(''.join(first_key[i][j:j + 2]))
-        first_key[i] = join_by_2
+    first_key = key
 
     w = []
     for i in range(44):
@@ -133,7 +123,6 @@ def word_to_key(words):
 
 
 def add_round_key(state, key):
-
     for i in range(len(key)):
         for j in range(len(key[i])):
 
