@@ -159,3 +159,26 @@ def encrypt(s, key):
     print()
     print("Round 11 (encrypted): ", encrypted_text)
     return encrypted_text
+
+
+def pad(s):
+    """
+    Padding Scheme
+
+    Method 1 from: http://www.di-mgt.com.au/cryptopad.html
+    """
+
+    # print([hex(ord(i)) for i in s])
+    d = (16 - len(s) % 16) or 16
+    s += d * chr(d)
+    return s
+
+
+def to_hex(s):
+    res = []
+    for i in range(0, len(s), 16):
+        x = []
+        for j in range(0, 16, 4):
+            x.append([hex(ord(k))[2:] for k in s[i:i + 16][j:j + 4]])
+        res.append(x)
+    return res

@@ -1,6 +1,7 @@
 from tables import *
 from encrypt import gen
 
+
 def inv_substi(s, inv_sbox):
     substi = []
     i = 0
@@ -130,3 +131,16 @@ def decrypt(c, key):
     print("Round 11 (decrypted):", decrypted_text)
     return decrypted_text
 
+
+def to_str(l):
+    s = ""
+    for i in l:
+        for j in i:
+            s += chr(int(j, 16))
+    return s
+
+
+def rmpad(s):
+    """ Remove padding """
+    end = ord(s[-1])
+    return s[0:-1 * end]
