@@ -130,34 +130,32 @@ def add_round_key(state, key):
                 int(key[i][j], 16) ^ int(state[i][j], 16))[2:]
     return key
 
-s = [['f3', 'cf', '4d', '15'], ['bf', '4b', 'fb', 'a6'],
-     ['8b', 'e2', '52', '58'], ['12', 'ab', '4b', 'b8']]
 
-key = ['d', '6', 'd', '3', 'a', '3', '9', '7', '6', '4', 'e', '8', '9', '2',
-       '0', '4', '0', '8', '2', 'e', 'b', '5', 'd', 'd', '2', 'b', '8', 'e',
-       'd', '5', '7', '6']
+def encrypt(s, key):
+    print("Input Matrix:", s)
+    print()
 
-print("Plain text:", s)
-print()
+    all_key = gen(key)
+    key = word_to_key([all_key[0], all_key[1], all_key[2], all_key[3]])
+    key_no = 4
+    s = add_round_key(s, key)
+    print("Round 1", s)
 
-all_key = gen(key)
-key = word_to_key([all_key[0], all_key[1], all_key[2], all_key[3]])
-key_no = 4
-s = add_round_key(s, key)
-print("Round 1", s)
+    round = 2
+    while round < 11:
+        round_text = mixcolumns(shiftrows(substitute(s, sbox)))
+        key = (word_to_key(
+            [all_key[key_no], all_key[key_no + 1], all_key[key_no + 2], all_key[key_no + 3]]))
+        s = add_round_key(round_text, key)
+        print("Round %d" % round, s)
 
-round = 2
-while round < 11:
-    round_text = mixcolumns(shiftrows(substitute(s, sbox)))
-    key = (word_to_key([all_key[key_no], all_key[key_no + 1], all_key[key_no + 2], all_key[key_no + 3]]))
-    s = add_round_key(round_text, key)
-    print("Round %d" % round, s)
+        key_no += 4
+        round += 1
 
-    key_no += 4
-    round += 1
-
-last_round = shiftrows(substitute(s, sbox))
-last_key = (word_to_key([all_key[key_no], all_key[key_no + 1], all_key[key_no + 2], all_key[key_no + 3]]))
-encrypted_text = add_round_key(last_round, last_key)
-print()
-print("Round 11 (Encrypted Text): ", encrypted_text)
+    last_round = shiftrows(substitute(s, sbox))
+    last_key = (word_to_key(
+        [all_key[key_no], all_key[key_no + 1], all_key[key_no + 2], all_key[key_no + 3]]))
+    encrypted_text = add_round_key(last_round, last_key)
+    print()
+    print("Round 11 (encrypted): ", encrypted_text)
+    return encrypted_text

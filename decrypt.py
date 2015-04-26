@@ -101,36 +101,32 @@ def add_round_key(state, key):
     return key
 
 
-cipher_text = [['84', '27', '3f', '5b'], ['df', '9d', 'ff', '31'],
-               ['25', '73', 'a2', '7e'], ['97', '6e', 'ad', '82']]
+def decrypt(c, key):
+    print("Input Matrix:", c)
+    print()
+    all_key = gen(key)
+    key_no = 40
 
-key = ['d', '6', 'd', '3', 'a', '3', '9', '7', '6', '4', 'e', '8', '9', '2',
-       '0', '4', '0', '8', '2', 'e', 'b', '5', 'd', 'd', '2', 'b', '8', 'e',
-       'd', '5', '7', '6']
+    last_key = word_to_key([all_key[key_no], all_key[key_no + 1],
+                            all_key[key_no + 2], all_key[key_no + 3]])
+    c = inv_substi(inv_shiftrows(add_round_key(c, last_key)), inv_sbox)
+    print("Round 1:", c)
 
-all_key = gen(key)
-key_no = 40
-print("Cipher text:", cipher_text)
-print()
+    round = 2
+    while key_no > 4:
+        key_no -= 4
+        key = word_to_key([all_key[key_no], all_key[key_no + 1],
+                           all_key[key_no + 2], all_key[key_no + 3]])
+        c = inv_substi(inv_shiftrows(inv_mixcolumns(add_round_key(c, key))), inv_sbox)
+        print("Round %d:" % round, c)
+        round += 1
 
-last_key = word_to_key([all_key[key_no], all_key[key_no + 1],
-                        all_key[key_no + 2], all_key[key_no + 3]])
-cipher_text = inv_substi(inv_shiftrows(add_round_key(cipher_text, last_key)), inv_sbox)
-print("Round 1:", cipher_text)
-
-round = 2
-while key_no > 4:
     key_no -= 4
     key = word_to_key([all_key[key_no], all_key[key_no + 1],
                        all_key[key_no + 2], all_key[key_no + 3]])
-    cipher_text = inv_substi(inv_shiftrows(inv_mixcolumns(add_round_key(cipher_text, key))), inv_sbox)
-    print("Round %d:" % round, cipher_text)
-    round += 1
+    decrypted_text = add_round_key(c, key)
 
-key_no -= 4
-key = word_to_key([all_key[key_no], all_key[key_no + 1],
-                   all_key[key_no + 2], all_key[key_no + 3]])
-decypted_text = add_round_key(cipher_text, key)
+    print()
+    print("Round 11 (decrypted):", decrypted_text)
+    return decrypted_text
 
-print()
-print("Round 11 (Decrypted text):", decypted_text)
