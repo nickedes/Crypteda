@@ -132,6 +132,7 @@ def add_round_key(state, key):
 
 
 def encrypt(s, key):
+    print()
     print("Input Matrix:", s)
     print()
 

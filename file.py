@@ -1,11 +1,8 @@
 from encrypt import pad, to_hex, encrypt
 from decrypt import rmpad, to_str, decrypt
 
-plain = input("Enter Plain Text: ")
+plain = open("plain.txt").read()
 key = input("Enter Key: ")
-
-# print("Plain Text: ", plain)
-# print("Key: ", key)
 
 print("\n-------------------- Encryption ----------------------\n")
 
