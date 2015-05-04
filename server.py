@@ -10,11 +10,7 @@ def encryption(plain, key):
     ct = []
     for block in inp:
         ct.append(encrypt(block, key))
-
-    encrypted_text = ""
-    for block in ct:
-        encrypted_text += to_str(block)
-    return encrypted_text
+    return ct
 
 key = 'Nikhil Mittal'
 
@@ -26,7 +22,8 @@ s.bind((host, port))        # Bind to the port
 s.listen(5)                 # Now wait for client connection.
 while True:
     c, addr = s.accept()     # Establish connection with client.
-    print 'Got connection from', addr
-    msg = raw_input("enter message:")
-    encrypted_text = encryption(msg, key)
-    c.send(encrypted_text)
+    print('Got connection from', addr)
+    msg = input("enter message:")
+    cipher_text = encryption(msg, key)
+    c.send(cipher_text)
+    print(c.recv(1024))
