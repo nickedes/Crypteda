@@ -1,6 +1,6 @@
 from encrypt import pad, to_hex, encrypt
 from decrypt import to_str
-import socket               # Import socket module
+import socket ,pickle             # Import socket module
 
 
 def encryption(plain, key):
@@ -25,5 +25,5 @@ while True:
     print('Got connection from', addr)
     msg = input("enter message:")
     cipher_text = encryption(msg, key)
-    c.send(cipher_text)
+    c.send(pickle.dumps(cipher_text))
     print(c.recv(1024))

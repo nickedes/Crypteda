@@ -1,7 +1,7 @@
 from encrypt import pad, to_hex, encrypt
 from decrypt import rmpad, to_str, decrypt
 
-import socket               # Import socket module
+import socket,pickle             # Import socket module
 
 
 def decryption(cipher, key):
@@ -9,10 +9,7 @@ def decryption(cipher, key):
     for block in cipher:
         dt.append(decrypt(block, key))
         print()
-    final = ""
-    for block in dt:
-        final += to_str(block)
-    return rmpad(final)
+    return dt
 
 key = 'Nikhil Mittal'
 
@@ -23,8 +20,9 @@ port = 12345                # Reserve a port for your service.
 s.connect((host, port))
 
 while True:
-    cipher_text = s.recv(1024)
+    cipher_text = pickle.loads(s.recv(1024))
+    print(cipher_text)
     decrypted_msg = decryption(cipher_text, key)
     print(decrypted_msg)
-    msg = input("enter message:")
-    s.send(msg)
+    # msg = input("enter message:")
+    # s.send(msg)
