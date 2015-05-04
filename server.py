@@ -26,4 +26,4 @@ while True:
     msg = input("enter message:")
     cipher_text = encryption(msg, key)
     c.send(pickle.dumps(cipher_text))
-    print(c.recv(1024))
+    # print(c.recv(1024))

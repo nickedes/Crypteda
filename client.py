@@ -1,4 +1,4 @@
-from encrypt import pad, to_hex, encrypt
+# from encrypt import pad, to_hex, encrypt
 from decrypt import rmpad, to_str, decrypt
 
 import socket,pickle             # Import socket module
@@ -8,7 +8,6 @@ def decryption(cipher, key):
     dt = []
     for block in cipher:
         dt.append(decrypt(block, key))
-        print()
     return dt
 
 key = 'Nikhil Mittal'
