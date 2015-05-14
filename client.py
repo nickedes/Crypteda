@@ -1,20 +1,26 @@
-# from encrypt import pad, to_hex, encrypt
+from encrypt import pad, to_hex
 from decrypt import rmpad, to_str, decrypt
 
-import socket,pickle             # Import socket module
+import socket
+import pickle
 
 
 def decryption(cipher, key):
     dt = []
+    key = to_hex(pad(key))[0]
+
     for block in cipher:
         dt.append(decrypt(block, key))
-    return dt
+    final = ""
+    for block in dt:
+        final += to_str(block)
+    return rmpad(final)
 
-key = 'Nikhil Mittal'
+key = 'nikhil'
 
-s = socket.socket()         # Create a socket object
-host = socket.gethostname()  # Get local machine name
-port = 12345                # Reserve a port for your service.
+s = socket.socket()
+host = socket.gethostname()
+port = 12345
 
 s.connect((host, port))
 
@@ -23,5 +29,3 @@ while True:
     print(cipher_text)
     decrypted_msg = decryption(cipher_text, key)
     print(decrypted_msg)
-    # msg = input("enter message:")
-    # s.send(msg)
